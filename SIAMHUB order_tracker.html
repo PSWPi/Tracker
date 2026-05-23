@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ติดตามพัสดุ — SiamHub</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--blue:#1a73e8;--blue-bg:#e8f0fe;--green:#1e8c45;--green-bg:#e6f4ea;--orange:#e37400;--orange-bg:#fef7e0;--red:#c5221f;--red-bg:#fce8e6;--gray:#5f6368;--gray-bg:#f1f3f4;--border:#dadce0;--white:#fff;--text:#202124;--text2:#5f6368}
+  body{font-family:'Sarabun',sans-serif;background:#f8f9fa;color:var(--text);min-height:100vh}
+  .hdr{background:var(--white);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .hdr-icon{width:36px;height:36px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+  .hdr-t{font-size:16px;font-weight:600}
+  .hdr-s{font-size:11px;color:var(--text2)}
+  .srch{padding:14px 16px 12px;background:var(--white);border-bottom:1px solid var(--border)}
+  .srch-row{display:flex;gap:8px}
+  .srch-row input{flex:1;border:1.5px solid var(--border);border-radius:28px;padding:12px 18px;font-size:16px;font-family:'Sarabun',sans-serif;outline:none;color:var(--text);background:var(--gray-bg)}
+  .srch-row input:focus{border-color:var(--blue);background:var(--white)}
+  .btn-go{background:var(--blue);color:#fff;border:none;border-radius:28px;padding:12px 22px;font-size:16px;font-family:'Sarabun',sans-serif;cursor:pointer;font-weight:500}
+  .btn-go:active{opacity:.85}
+  .srch-hint{font-size:12px;color:var(--text2);margin-top:8px;padding:0 4px}
+  .body{padding:12px 16px}
+  .state{text-align:center;padding:52px 16px;color:var(--text2)}
+  .state .ico{font-size:44px;margin-bottom:12px}
+  .state p{font-size:14px;line-height:1.7}
+  .card{background:var(--white);border-radius:14px;border:1px solid var(--border);margin-bottom:10px;overflow:hidden}
+  .ct{padding:14px 16px 12px;border-bottom:1px solid var(--gray-bg)}
+  .crow{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .courier-txt{font-size:12px;color:var(--text2);background:var(--gray-bg);padding:3px 8px;border-radius:6px}
+  .bdg{display:inline-block;font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px}
+  .bw{background:var(--orange-bg);color:var(--orange)}
+  .bt{background:var(--blue-bg);color:var(--blue)}
+  .bd{background:var(--green-bg);color:var(--green)}
+  .br{background:var(--red-bg);color:var(--red)}
+  .bc{background:var(--gray-bg);color:var(--gray)}
+  .cname{font-size:17px;font-weight:600;margin-bottom:3px}
+  .cphone{font-size:13px;color:var(--text2);margin-bottom:10px}
+  .trow{display:flex;align-items:center;gap:8px;background:var(--gray-bg);border-radius:10px;padding:10px 12px}
+  .tnum{font-size:14px;font-weight:600;flex:1;letter-spacing:.5px;word-break:break-all}
+  .bsm{background:none;border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:12px;color:var(--text2);cursor:pointer;font-family:'Sarabun',sans-serif;white-space:nowrap}
+  .bsm.ok{border-color:var(--green);color:var(--green)}
+  .cm{padding:10px 16px}
+  .mrow{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;font-size:13px;border-bottom:1px solid #f1f3f4}
+  .mrow:last-child{border:none}
+  .ml{color:var(--text2);flex-shrink:0}
+  .mv{font-weight:500;text-align:right;max-width:68%;word-break:break-word}
+  .ca{padding:10px 16px;display:flex;gap:8px;border-top:1px solid var(--gray-bg)}
+  .ba{flex:1;padding:10px 6px;border-radius:10px;font-size:13px;cursor:pointer;font-family:'Sarabun',sans-serif;font-weight:500;display:flex;align-items:center;justify-content:center;gap:5px;border:none}
+  .ba-msg{background:var(--blue-bg);color:var(--blue)}
+  .ba-17{background:var(--green-bg);color:var(--green)}
+  .ba-is{background:var(--gray-bg);color:var(--text)}
+  .ba:active{opacity:.8}
+  .ri{font-size:13px;color:var(--text2);margin-bottom:8px}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#323232;color:#fff;padding:10px 22px;border-radius:24px;font-size:14px;font-family:'Sarabun',sans-serif;z-index:999;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
+  .toast.on{opacity:1}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spin{width:32px;height:32px;border:3px solid var(--blue-bg);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 14px}
+  .src-label{font-size:11px;color:var(--text2);margin-top:6px;padding:0 4px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-icon">📦</div>
+  <div>
+    <div class="hdr-t">ติดตามพัสดุ</div>
+    <div class="hdr-s">Order Tracking — by SiamHub</div>
+  </div>
+</div>
+
+<div class="srch">
+  <div class="srch-row">
+    <input type="text" id="q" placeholder="Tracking / เบอร์โทร / ชื่อ / Order#..." autocomplete="off" />
+    <button class="btn-go" onclick="doSearch()">ค้นหา</button>
+  </div>
+  <div class="srch-hint">🔍 ระบบตรวจจับอัตโนมัติ — พิมพ์อะไรก็ได้</div>
+</div>
+
+<div class="body">
+  <div id="result">
+    <div class="state">
+      <div class="ico">📦</div>
+      <p>พิมพ์ข้อมูลเพื่อค้นหาออเดอร์<br><span style="font-size:13px">Tracking · เบอร์โทร · ชื่อ · Shopify Order#</span></p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzWfhhs7wlVxci2mGQ9BU_c02tetJl972OstUb0M4KGztbuywBht-anu8fWb0vYqReT/exec';
+const ISHIP_PROXY = 'https://iship.piriyaro.workers.dev';
+const TOKEN = 's70HLccjLD9TdZuOThlzBqKLVyZR3J6ic1Mo6TMCaKF6OA6r5sjhqpcpzGD9UypfReXcdudIyiRiy9upGwNYKrpaEJijo8s4ZVWY';
+
+let cache = {};
+
+function detectType(q) {
+  const c = q.replace(/\s/g,'');
+  if(/^TH[A-Z0-9]{8,}$/i.test(c)) return 'tracking';
+  if(/^\d{8,10}$/.test(c)) return 'phone';
+  if(/^#?\d{3,7}$/.test(c)) return 'order';
+  return 'name';
+}
+
+function stInfo(s) {
+  const m={1:{t:'รอเข้ารับพัสดุ',c:'bw'},2:{t:'รับพัสดุแล้ว',c:'bt'},3:{t:'ระหว่างขนส่ง',c:'bt'},4:{t:'จัดส่งสำเร็จ',c:'bd'},5:{t:'ชำระเงินสำเร็จ',c:'bd'},6:{t:'ตีกลับ/คืนสินค้า',c:'br'},7:{t:'ยกเลิก',c:'bc'}};
+  if(m[+s]) return m[+s];
+  const sl=(s||'').toLowerCase();
+  if(sl.includes('สำเร็จ')||sl.includes('deliver')) return {t:s,c:'bd'};
+  if(sl.includes('ระหว่าง')||sl.includes('transit')||sl.includes('จัดส่งแล้ว')) return {t:s,c:'bt'};
+  if(sl.includes('ตีกลับ')||sl.includes('return')) return {t:s,c:'br'};
+  if(sl.includes('ยกเลิก')||sl.includes('cancel')) return {t:s,c:'bc'};
+  return {t:s||'ไม่ทราบ',c:'bc'};
+}
+
+function fCOD(v){return v&&+v>0?Number(v).toLocaleString('th-TH',{minimumFractionDigits:2})+' ฿':null}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),2200);
+}
+
+function copyTrack(uid,tr){
+  navigator.clipboard.writeText(tr).then(()=>{
+    const b=document.getElementById('bt-'+uid);
+    b.textContent='✅ แล้ว';b.classList.add('ok');
+    setTimeout(()=>{b.textContent='คัดลอก';b.classList.remove('ok');},2000);
+  });
+}
+
+function copyMsg(i){
+  const o=cache[i];if(!o)return;
+  const stDesc = o.status_desc || o.status_bigseller || o.status_iship || '';
+  const cod=fCOD(o.cod_amount);
+  const tr=o.tracking||'';
+  const lines=[
+    '📦 สถานะพัสดุ',
+    `👤 ${o.dst_name||'-'}`,
+    `🚚 ${stDesc}`,
+    `🔢 Tracking: ${tr}`,
+    cod?`💰 COD: ${cod}`:'',
+    tr?`🔗 https://t.17track.net/en#nums=${tr}`:''
+  ].filter(Boolean);
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>toast('✅ คัดลอกข้อความแล้ว'));
+}
+
+function buildCard(o,i){
+  // ใช้ status จาก iShip ถ้ามี ไม่งั้นใช้จาก BigSeller
+  const rawStatus = o.status_iship || o.status_desc || o.status_bigseller || '';
+  const st = stInfo(rawStatus);
+  const stShow = o.status_desc || rawStatus || st.t;
+  const tr = o.tracking||'';
+  const cod = fCOD(o.cod_amount);
+  const uid = 'c'+i;
+  const u17 = tr?`https://t.17track.net/en#nums=${tr}`:'';
+  const uis = tr?`https://app.iship.cloud/detail/${tr}`:'';
+
+  return `<div class="card">
+  <div class="ct">
+    <div class="crow">
+      <span class="courier-txt">${o.courier_code||'—'}</span>
+      <span class="bdg ${st.c}">${stShow}</span>
+    </div>
+    <div class="cname">${o.dst_name||'-'}</div>
+    <div class="cphone">📱 ${o.dst_phone||'-'}</div>
+    ${tr?`<div class="trow"><span class="tnum">${tr}</span><button class="bsm" id="bt-${uid}" onclick="copyTrack('${uid}','${tr}')">คัดลอก</button></div>`:''}
+  </div>
+  <div class="cm">
+    ${o.platform_order_id || o.order_id?`<div class="mrow"><span class="ml">Order#</span><span class="mv">${o.platform_order_id || o.order_id}</span></div>`:''}
+    ${cod?`<div class="mrow"><span class="ml">COD</span><span class="mv" style="color:var(--orange);font-weight:600">${cod}</span></div>`:''}
+    ${o.updated_at?`<div class="mrow"><span class="ml">อัปเดต</span><span class="mv">${o.updated_at}</span></div>`:''}
+  </div>
+  <div class="ca">
+    <button class="ba ba-msg" onclick="copyMsg(${i})">📋 คัดลอกข้อความ</button>
+    ${u17?`<button class="ba ba-17" onclick="window.open('${u17}','_blank')">🌐 17Track</button>`:''}
+    ${uis?`<button class="ba ba-is" onclick="window.open('${uis}','_blank')">📄 iShip</button>`:''}
+  </div>
+</div>`;
+}
+
+async function doSearch(){
+  const q = document.getElementById('q').value.trim();
+  if(!q) return;
+  cache = {};
+  const area = document.getElementById('result');
+  area.innerHTML = `<div class="state"><div class="spin"></div><p>กำลังค้นหา...</p></div>`;
+
+  const type = detectType(q);
+
+  try {
+    let orders = [];
+
+    if(type === 'tracking') {
+      // ค้นจาก Sheet ก่อน
+      try {
+        const r = await fetch(APPS_SCRIPT_URL + '?q=' + encodeURIComponent(q));
+        const j = await r.json();
+        if(j.status === 'ok' && j.count > 0) {
+          orders = j.data;
+        }
+      } catch(e) {}
+
+      // ถ้าไม่เจอใน Sheet ดึงจาก iShip โดยตรง
+      if(!orders.length) {
+        const res = await fetch(`${ISHIP_PROXY}/get_order/${encodeURIComponent(q)}`, {
+          headers: {'Authorization': 'Bearer ' + TOKEN, 'Accept': 'application/json'}
+        });
+        if(res.ok) {
+          const j = await res.json();
+          if(j.status && j.data) {
+            orders = [{
+              tracking: j.data.track_no,
+              order_id: j.data.custom_order_id || '',
+              status_iship: String(j.data.status||''),
+              status_desc: j.data.status_name || '',
+              status_bigseller: '',
+              courier_code: j.data.courier_code || '',
+              dst_name: j.data.dst_name || '',
+              dst_phone: j.data.dst_phone || '',
+              cod_amount: j.data.cod_amount || '',
+              updated_at: j.data.updated || '',
+            }];
+          }
+        }
+      }
+    } else {
+      // ค้นจาก Sheet (ชื่อ/เบอร์/order#)
+      const r = await fetch(APPS_SCRIPT_URL + '?q=' + encodeURIComponent(q));
+      const j = await r.json();
+      if(j.status === 'ok') orders = j.data;
+    }
+
+    if(!orders.length){
+      area.innerHTML=`<div class="state"><div class="ico">📭</div><p>ไม่พบออเดอร์ที่ตรงกัน<br><span style="font-size:12px;color:var(--text2)">ลองค้นด้วยข้อมูลอื่น หรือรอ sync ข้อมูลใหม่</span></p></div>`;
+      return;
+    }
+
+    orders.forEach((o,i) => cache[i] = o);
+    area.innerHTML = `<div class="ri">พบ ${orders.length} รายการ</div>` + orders.map((o,i) => buildCard(o,i)).join('');
+
+  } catch(e) {
+    area.innerHTML = `<div class="state"><div class="ico">⚠️</div><p style="color:var(--red)"><b>เกิดข้อผิดพลาด</b><br>${e.message}</p></div>`;
+  }
+}
+
+window.onload = () => {
+  const t = new URLSearchParams(location.search).get('t');
+  if(t){ document.getElementById('q').value = t; doSearch(); }
+};
+document.getElementById('q').addEventListener('keydown', e => { if(e.key==='Enter') doSearch(); });
+</script>
+</body>
+</html>
